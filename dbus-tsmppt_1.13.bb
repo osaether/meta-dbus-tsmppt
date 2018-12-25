@@ -20,3 +20,13 @@ DAEMONTOOLS_RUN = "softlimit -d 100000000 -s 1000000 -a 100000000 ${bindir}/${PN
 # why? dbus connection, will be fixed when switching to common code..
 EXTRA_QMAKEVARS_POST += "DEFINES+=TARGET_beaglebone"
 
+pkg_postinst_${PN} () {
+	cd /opt/victronenergy/gui/qml
+	svc -d /service/gui
+	cp /opt/victronenergy/dbus-tsmppt/PageSettingsTsmppt.qml .
+	cp PageSettings.qml PageSettings.qml.save
+	cp PageSolarCharger.qml PageSolarCharger.qml.save
+	patch -p1 PageSettings.qml /opt/victronenergy/dbus-tsmppt/PageSettings.diff
+	patch -p1 PageSolarCharger.qml /opt/victronenergy/dbus-tsmppt/PageSolarCharger.diff
+	svc -u /service/gui
+}
